@@ -20,6 +20,7 @@ set(LLVM_LINK_COMPONENTS
   Support
   Target
   TransformUtils
+  Custom
   )
 
 # In a standard Clang+LLVM build, we need to generate intrinsics before
