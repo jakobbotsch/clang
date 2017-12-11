@@ -1370,6 +1370,7 @@ Parser::isCXXDeclarationSpecifier(Parser::TPResult BracedCastResult,
   case tok::kw__Nullable:
   case tok::kw__Null_unspecified:
   case tok::kw___kindof:
+  case tok::kw_secure:
     return TPResult::True;
 
     // Borland

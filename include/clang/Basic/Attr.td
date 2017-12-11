@@ -2772,3 +2772,10 @@ def InternalLinkage : InheritableAttr {
   let Subjects = SubjectList<[Var, Function, CXXRecord]>;
   let Documentation = [InternalLinkageDocs];
 }
+
+def SGXSecure : InheritableAttr {
+  let Spellings = [Keyword<"secure">];
+  let Subjects = SubjectList<[Function, GlobalVar], ErrorDiag,
+                             "ExpectedFunctionGlobalVarMethodOrProperty">;
+  let Documentation = [Undocumented];
+}

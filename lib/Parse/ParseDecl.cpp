@@ -3325,6 +3325,12 @@ void Parser::ParseDeclarationSpecifiers(DeclSpec &DS,
       ParseMicrosoftTypeAttributes(DS.getAttributes());
       continue;
 
+    case tok::kw_secure:
+      DS.getAttributes().addNew(Tok.getIdentifierInfo(), Loc,
+                                nullptr, Loc,
+                                nullptr, 0, AttributeList::AS_Keyword);
+      break;
+
     // Borland single token adornments.
     case tok::kw___pascal:
       ParseBorlandTypeAttributes(DS.getAttributes());
@@ -4856,6 +4862,9 @@ bool Parser::isDeclarationSpecifier(bool DisambiguatingWithExpression) {
   case tok::kw___forceinline:
   case tok::kw___pascal:
   case tok::kw___unaligned:
+
+  // SGX
+  case tok::kw_secure:
 
   case tok::kw__Nonnull:
   case tok::kw__Nullable:
