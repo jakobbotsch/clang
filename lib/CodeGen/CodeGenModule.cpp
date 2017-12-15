@@ -1092,6 +1092,9 @@ void CodeGenModule::setNonAliasAttributes(const Decl *D,
 
     if (const SectionAttr *SA = D->getAttr<SectionAttr>())
       GO->setSection(SA->getName());
+
+    if (D->hasAttr<SGXSecureAttr>())
+      GO->setSection("sgxtext");
   }
 
   getTargetCodeGenInfo().setTargetAttributes(D, GO, *this, ForDefinition);
@@ -1205,6 +1208,9 @@ void CodeGenModule::SetFunctionAttributes(GlobalDecl GD, llvm::Function *F,
 
   if (const SectionAttr *SA = FD->getAttr<SectionAttr>())
     F->setSection(SA->getName());
+
+  if (FD->hasAttr<SGXSecureAttr>())
+    F->setSection("sgxtext");
 
   if (FD->isReplaceableGlobalAllocationFunction()) {
     // A replaceable global allocation function does not act like a builtin by
@@ -2452,6 +2458,9 @@ CodeGenModule::GetOrCreateLLVMGlobal(StringRef MangledName,
     if (D->hasExternalStorage()) {
       if (const SectionAttr *SA = D->getAttr<SectionAttr>())
         GV->setSection(SA->getName());
+
+      if (D->hasAttr<SGXSecureAttr>())
+        GV->setSection("sgxtext");
     }
 
     // Handle XCore specific ABI requirements.
@@ -2974,7 +2983,8 @@ static bool isVarDeclStrongDefinition(const ASTContext &Context,
     return true;
 
   // A variable cannot be both common and exist in a section.
-  if (D->hasAttr<SectionAttr>())
+  if (D->hasAttr<SectionAttr>() ||
+      D->hasAttr<SGXSecureAttr>())
     return true;
 
   // A variable cannot be both common and exist in a section.

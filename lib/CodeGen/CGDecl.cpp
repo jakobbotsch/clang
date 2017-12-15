@@ -422,6 +422,9 @@ void CodeGenFunction::EmitStaticVarDecl(const VarDecl &D,
   if (const SectionAttr *SA = D.getAttr<SectionAttr>())
     var->setSection(SA->getName());
 
+  if (D.hasAttr<SGXSecureAttr>())
+    var->setSection("sgxtext");
+
   if (D.hasAttr<UsedAttr>())
     CGM.addUsedGlobal(var);
 
