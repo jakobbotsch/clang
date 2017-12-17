@@ -55,6 +55,7 @@
 #include "llvm/Transforms/ObjCARC.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Scalar/GVN.h"
+#include "llvm/Transforms/SGX.h"
 #include "llvm/Transforms/Utils/NameAnonGlobals.h"
 #include "llvm/Transforms/Utils/SymbolRewriter.h"
 #include <memory>
@@ -575,6 +576,8 @@ void EmitAssemblyHelper::CreatePasses(legacy::PassManager &MPM,
 
   if (LangOpts.CoroutinesTS)
     addCoroutinePassesToExtensionPoints(PMBuilder);
+
+  addSGXPassesToExtensionPoints(PMBuilder);
 
   if (LangOpts.Sanitize.hasOneOf(SanitizerKind::Efficiency)) {
     PMBuilder.addExtension(PassManagerBuilder::EP_OptimizerLast,
