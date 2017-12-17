@@ -34,6 +34,7 @@
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/Type.h"
+#include "llvm/Transforms/SGX.h"
 
 using namespace clang;
 using namespace CodeGen;
@@ -423,7 +424,7 @@ void CodeGenFunction::EmitStaticVarDecl(const VarDecl &D,
     var->setSection(SA->getName());
 
   if (D.hasAttr<SGXSecureAttr>())
-    var->setSection("sgxtext");
+    var->addAttribute(SGX_SECURE_ATTR);
 
   if (D.hasAttr<UsedAttr>())
     CGM.addUsedGlobal(var);

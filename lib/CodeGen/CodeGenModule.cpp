@@ -56,6 +56,7 @@
 #include "llvm/Support/ConvertUTF.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MD5.h"
+#include "llvm/Transforms/SGX.h"
 
 using namespace clang;
 using namespace CodeGen;
@@ -1028,6 +1029,9 @@ void CodeGenModule::SetLLVMFunctionAttributesForDefinition(const Decl *D,
       B.addAttribute(llvm::Attribute::MinSize);
   }
 
+  if (D->hasAttr<SGXSecureAttr>())
+    B.addAttribute(SGX_SECURE_ATTR);
+
   F->addAttributes(llvm::AttributeList::FunctionIndex, B);
 
   unsigned alignment = D->getMaxAlignment() / Context.getCharWidth();
@@ -1082,19 +1086,20 @@ void CodeGenModule::setNonAliasAttributes(const Decl *D,
         GV->addAttribute("data-section", SA->getName());
       if (auto *SA = D->getAttr<PragmaClangRodataSectionAttr>())
         GV->addAttribute("rodata-section", SA->getName());
+      if (D->hasAttr<SGXSecureAttr>())
+        GV->addAttribute(SGX_SECURE_ATTR);
     }
 
     if (auto *F = dyn_cast<llvm::Function>(GO)) {
       if (auto *SA = D->getAttr<PragmaClangTextSectionAttr>())
        if (!D->getAttr<SectionAttr>())
          F->addFnAttr("implicit-section-name", SA->getName());
+      if (D->hasAttr<SGXSecureAttr>())
+        F->addFnAttr(SGX_SECURE_ATTR);
     }
 
     if (const SectionAttr *SA = D->getAttr<SectionAttr>())
       GO->setSection(SA->getName());
-
-    if (D->hasAttr<SGXSecureAttr>())
-      GO->setSection("sgxtext");
   }
 
   getTargetCodeGenInfo().setTargetAttributes(D, GO, *this, ForDefinition);
@@ -1210,7 +1215,7 @@ void CodeGenModule::SetFunctionAttributes(GlobalDecl GD, llvm::Function *F,
     F->setSection(SA->getName());
 
   if (FD->hasAttr<SGXSecureAttr>())
-    F->setSection("sgxtext");
+    F->addFnAttr(SGX_SECURE_ATTR);
 
   if (FD->isReplaceableGlobalAllocationFunction()) {
     // A replaceable global allocation function does not act like a builtin by
@@ -2458,9 +2463,6 @@ CodeGenModule::GetOrCreateLLVMGlobal(StringRef MangledName,
     if (D->hasExternalStorage()) {
       if (const SectionAttr *SA = D->getAttr<SectionAttr>())
         GV->setSection(SA->getName());
-
-      if (D->hasAttr<SGXSecureAttr>())
-        GV->setSection("sgxtext");
     }
 
     // Handle XCore specific ABI requirements.
