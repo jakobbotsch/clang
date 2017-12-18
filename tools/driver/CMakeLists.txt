@@ -11,6 +11,7 @@ set( LLVM_LINK_COMPONENTS
   ObjCARCOpts
   Option
   ScalarOpts
+  SGX
   Support
   TransformUtils
   Vectorize

@@ -4085,6 +4085,9 @@ static void handleAlwaysInlineAttr(Sema &S, Decl *D,
   if (checkAttrMutualExclusion<NotTailCalledAttr>(S, D, Attr.getRange(),
                                                   Attr.getName()))
     return;
+  if (checkAttrMutualExclusion<SGXSecureAttr>(S, D, Attr.getRange(),
+                                              Attr.getName()))
+    return;
 
   if (AlwaysInlineAttr *Inline = S.mergeAlwaysInlineAttr(
           D, Attr.getRange(), Attr.getName(),
@@ -6442,7 +6445,8 @@ static void ProcessDeclAttribute(Sema &S, Scope *scope, Decl *D,
     handleSimpleAttribute<LTOVisibilityPublicAttr>(S, D, Attr);
     break;
   case AttributeList::AT_SGXSecure:
-    handleSimpleAttribute<SGXSecureAttr>(S, D, Attr);
+    handleSimpleAttributeWithExclusions<SGXSecureAttr, AlwaysInlineAttr>(
+        S, D, Attr);
     break;
   // Microsoft attributes:
   case AttributeList::AT_EmptyBases:

@@ -577,8 +577,6 @@ void EmitAssemblyHelper::CreatePasses(legacy::PassManager &MPM,
   if (LangOpts.CoroutinesTS)
     addCoroutinePassesToExtensionPoints(PMBuilder);
 
-  addSGXPassesToExtensionPoints(PMBuilder);
-
   if (LangOpts.Sanitize.hasOneOf(SanitizerKind::Efficiency)) {
     PMBuilder.addExtension(PassManagerBuilder::EP_OptimizerLast,
                            addEfficiencySanitizerPass);
